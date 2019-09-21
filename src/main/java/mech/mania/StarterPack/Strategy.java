@@ -33,6 +33,38 @@ public class Strategy {
     }
 
     /**
+     * int[][] attackPattern = {
+     *                 {0, 0, 0, 0, 0, 0, 0},
+     *                 {0, 0, 0, 0, 0, 0, 0},
+     *                 {0, 0, 0, 0, 0, 0, 0},
+     *                 {0, 0, 0, 0, 2, 0, 0},
+     *                 {0, 0, 0, 0, 2, 0, 0},
+     *                 {0, 0, 0, 0, 0, 0, 0},
+     *                 {0, 0, 0, 0, 0, 0, 0}
+     *         };
+     *         boolean[][] terrainPattern = {
+     *                 {false, false, false, false, false, false, false},
+     *                 {false, false, false, false, false, false, false},
+     *                 {false, false, false, false, false, false, false},
+     *                 {false, false, false, false, true, false, false},
+     *                 {false, false, false, false, true, false, false},
+     *                 {false, false, false, false, false, false, false},
+     *                 {false, false, false, false, false, false, false}
+     *         };
+     *         int health = 7;
+     *         int speed = 1;
+     *
+     *         Our previously winning combo except for 4 losses.
+     *         Keep the attack as default one.
+     *
+     *         Version: f94db48b-e2f4-4e16-a8c7-74805df8d0c8
+     *
+     *
+     *         Version 2: cce50df3-3831-48f3-9efe-25a2827a7a06
+     */
+
+
+    /**
      * Method to set unit initializations. Run at the beginning of a game, after assigning player numbers.
      * @return An array of {@link UnitSetup} objects which define attack pattern, terrain creation pattern, health, and speed.
      * @see UnitSetup
@@ -42,9 +74,9 @@ public class Strategy {
         int[][] attackPattern = {
                 {0, 0, 0, 0, 0, 0, 0},
                 {0, 0, 0, 0, 0, 0, 0},
-                {0, 0, 0, 0, 2, 0, 0},
-                {0, 0, 0, 0, 2, 2, 0},
-                {0, 0, 0, 0, 2, 0, 0},
+                {0, 0, 0, 0, 1, 1, 0},
+                {0, 0, 0, 0, 1, 1, 0},
+                {0, 0, 0, 0, 1, 1, 0},
                 {0, 0, 0, 0, 0, 0, 0},
                 {0, 0, 0, 0, 0, 0, 0}
         };
@@ -57,8 +89,8 @@ public class Strategy {
                 {false, false, false, false, false, false, false},
                 {false, false, false, false, false, false, false}
         };
-        int health = 5;
-        int speed = 5;
+        int health = 8;
+        int speed = 3;
 
         UnitSetup unit1;
         UnitSetup unit2;
@@ -245,12 +277,12 @@ public class Strategy {
             }
             System.out.println("New row");
         }
-        System.out.println(isTerrainPresent(gameState, 0, 2));
-        System.out.println(isTerrainPresent(gameState, 0, 1));
-         */
+        */
 
         Direction[] unitOneDirection = null;
         Direction[] unitTwoDirection = null;
+        Position initUnitOne = null;
+        Position initUnitTwo = null;
 
         // Default values
         Decision[] turnResponse = new Decision[myUnits.size()];
@@ -258,54 +290,60 @@ public class Strategy {
             int priority = u + 1;
             Direction[] movementSteps = new Direction[myUnits.get(u).getSpeed()];
 
+            if(priority == 1) {
+                initUnitOne = myUnits.get(0).getPos();
+            } else if(priority == 2) {
+                initUnitTwo = myUnits.get(1).getPos();
+            }
 
             for(int s = 0; s < movementSteps.length; s++) {
+                System.out.println("Init in for loop start position " + myUnits.get(priority - 1).getPos().x + " " + myUnits.get(priority - 1).getPos().y);
                 int currentRow = 11 - myUnits.get(priority - 1).getPos().y;
                 int currentColumn = myUnits.get(priority - 1).getPos().x;
-                List<Direction> availableDirections = getAvailableDirections(gameState, priority, myUnits,
+                List<Direction> availableDirections = getAvailableDirections(gameState, initUnitOne, initUnitTwo, priority, myUnits,
                                 unitOneDirection, unitTwoDirection, currentRow, currentColumn);
                 int random = (int) (Math.random() * availableDirections.size());
 
-                for(Direction direction : availableDirections) {
-                    System.out.println(direction);
-                }
+                //for(Direction direction : availableDirections) {
+                //    System.out.println(direction);
+                //}
                 System.out.println(currentRow);
-                System.out.println(currentColumn + "\n");
+                System.out.println(currentColumn);
                 Direction randomDir = availableDirections.get(random);
-                System.out.println(randomDir);
+                //System.out.println(randomDir);
                 Position newPosition;
                 switch (randomDir) {
                     case UP:
-                        System.out.println("Up direction");
+                        System.out.println("Up direction\n");
                         movementSteps[s] = Direction.UP;
                         newPosition = new Position(currentColumn, 12 - currentRow);
                         myUnits.get(priority - 1).setPos(newPosition);
-                        System.out.println("New position: " + myUnits.get(priority - 1).getPos().x
-                                    + " " + myUnits.get(priority - 1).getPos().y);
+                        //System.out.println("New position: " + myUnits.get(priority - 1).getPos().x
+                        //            + " " + myUnits.get(priority - 1).getPos().y);
                         break;
                     case DOWN:
                         System.out.println("Down direction");
                         movementSteps[s] = Direction.DOWN;
                         newPosition = new Position(currentColumn, 10 - currentRow);
                         myUnits.get(priority - 1).setPos(newPosition);
-                        System.out.println("New position: " + myUnits.get(priority - 1).getPos().x
-                                    + " " + myUnits.get(priority - 1).getPos().y);
+                        //System.out.println("New position: " + myUnits.get(priority - 1).getPos().x
+                        //            + " " + myUnits.get(priority - 1).getPos().y);
                         break;
                     case LEFT:
                         System.out.println("Left direction");
                         movementSteps[s] = Direction.LEFT;
                         newPosition = new Position(currentColumn - 1, 11 - currentRow);
                         myUnits.get(priority - 1).setPos(newPosition);
-                        System.out.println("New position: " + myUnits.get(priority - 1).getPos().x
-                                                + " " + myUnits.get(priority - 1).getPos().y);
+                        //System.out.println("New position: " + myUnits.get(priority - 1).getPos().x
+                        //                        + " " + myUnits.get(priority - 1).getPos().y);
                         break;
                     case RIGHT:
                         System.out.println("Right direction");
                         movementSteps[s] = Direction.RIGHT;
                         newPosition = new Position(currentColumn + 1, 11 - currentRow);
                         myUnits.get(priority - 1).setPos(newPosition);
-                        System.out.println("New position: " + myUnits.get(priority - 1).getPos().x
-                                    + " " + myUnits.get(priority - 1).getPos().y);
+                        //System.out.println("New position: " + myUnits.get(priority - 1).getPos().x
+                        //            + " " + myUnits.get(priority - 1).getPos().y);
                         break;
                     case STAY:
                         movementSteps[s] = Direction.STAY;
@@ -316,27 +354,21 @@ public class Strategy {
 
             if(priority == 1) {
                 unitOneDirection = movementSteps;
+                //for(Direction direction : unitOneDirection) {
+                //    System.out.println(direction);
+                //}
             } else if(priority == 2) {
                 unitTwoDirection = movementSteps;
             }
 
-
-            // Attack if would damage walls or an enemy unit
             Direction attackDirection = Direction.STAY;
-            List<Pair<Position, Integer>> posOfAttack =
-                    gameState.getPositionsOfAttackPattern(
-                            gameState.getPositionAfterMovement(myUnits.get(u).getPos(), movementSteps),
-                            myUnits.get(u).getAttack(), Direction.UP);
-            for(Pair p : posOfAttack){
-                Position pos = (Position)p.getFirst();
-                try {
-                    Tile t = gameState.getTiles()[pos.x][pos.y];
-                    if (t.getType() != Tile.Type.BLANK || (t.getUnit() != null && t.getUnit().getPlayerNum() != playerNum)) {
-                        attackDirection = Direction.UP;
-                        break;
-                    }
-                } catch(ArrayIndexOutOfBoundsException e){
-                    continue;
+            // Skipping STAY direction
+            for(int i = 0; i < Direction.values().length - 1; i++) {
+                Direction recommendedAttackDirection = checkAttackDirection(gameState, enemyUnits, myUnits,
+                                                        movementSteps, u, (Direction.values())[i]);
+                if(recommendedAttackDirection != null && Direction.STAY != recommendedAttackDirection) {
+                    attackDirection = recommendedAttackDirection;
+                    break;
                 }
             }
 
@@ -355,17 +387,17 @@ public class Strategy {
      * @return
      */
     public static boolean isTerrainPresent(GameState gameState, int row, int column) {
-        Tile[][] tiles = gameState.getTiles();
+        Tile[][] tiles = getTiles(gameState);
         int oldRow = row;
         row = 11 - column;
         column = oldRow;
-        System.out.println("Terrain present " + row);
-        System.out.println("Terrain present " + column);
-        System.out.println(tiles[row][column].getType());
+        //System.out.println("Terrain present " + row);
+        //System.out.println("Terrain present " + column);
+        //System.out.println(tiles[row][column].getType());
         return !(tiles[row][column].getType().equals(Tile.Type.BLANK));
     }
 
-    public static List<Position> friendlyMechPositions(GameState gameState, int priority, List<Unit> myUnits,
+    public static List<Position> friendlyMechPositions(GameState gameState, Position initUnitOne, Position initUnitTwo, int priority, List<Unit> myUnits,
                                                    Direction[] unitOneMoves, Direction[] unitTwoMoves) {
         Unit unitTwoInitial = myUnits.get(1);
         Unit unitThreeInitial = myUnits.get(2);
@@ -374,35 +406,23 @@ public class Strategy {
             result.add(unitTwoInitial.getPos());
             result.add(unitThreeInitial.getPos());
         } else if(priority == 2) {
-            Position unitOneFinal = gameState.getPositionAfterMovement(myUnits.get(0).getPos(), unitOneMoves);
+            System.out.println("Unit 1 start: " + initUnitOne.x + " " + initUnitOne.y);
+            Position unitOneFinal = gameState.getPositionAfterMovement(initUnitOne, unitOneMoves);
             result.add(unitOneFinal);
             result.add(unitThreeInitial.getPos());
+            System.out.println("Mech 2's perspective. Mech 1 x: " + result.get(0).x);
+            System.out.println("Mech 2's perspective. Mech 1 y: " + result.get(0).y);
         } else if(priority == 3) {
-            Position unitOneFinal = gameState.getPositionAfterMovement(myUnits.get(0).getPos(), unitOneMoves);
-            Position unitTwoFinal = gameState.getPositionAfterMovement(myUnits.get(1).getPos(), unitTwoMoves);
+            Position unitOneFinal = gameState.getPositionAfterMovement(initUnitOne, unitOneMoves);
+            Position unitTwoFinal = gameState.getPositionAfterMovement(initUnitTwo, unitTwoMoves);
             result.add(unitOneFinal);
             result.add(unitTwoFinal);
         }
 
         return result;
     }
-    /*
-    public static boolean isSafePosition(GameState gameState, int priority, List<Unit> myUnits,
-                                         Direction[] unitOneMoves, Direction[] unitTwoMoves, int row, int column) {
-        Position[] unsafePositions = friendlyMechPositions(gameState, priority, myUnits, unitOneMoves, unitTwoMoves);
-        int rowOne = 11 - unsafePositions[0].y;
-        int columnOne = unsafePositions[0].x;
-        int rowTwo = 11 - unsafePositions[1].y;
-        int columnTwo = unsafePositions[1].x;
-        if(!isTerrainPresent(gameState, row, column) && row != rowOne && row != rowTwo && column != columnOne &&
-            column != columnTwo) {
-            return true;
-        }
-        return false;
-    }
-     */
 
-    public static List<Direction> getAvailableDirections(GameState gameState, int priority, List<Unit> myUnits,
+    public static List<Direction> getAvailableDirections(GameState gameState, Position initUnitOne, Position initUnitTwo, int priority, List<Unit> myUnits,
                                                          Direction[] unitOneMoves, Direction[] unitTwoMoves,
                                                          int row, int column) {
         int rowOne = -1;
@@ -411,37 +431,64 @@ public class Strategy {
         int columnTwo = -1;
         List<Direction> result = new ArrayList<Direction>();
         if(myUnits.size() == 3) {
-            List<Position> unsafePositions = friendlyMechPositions(gameState, priority, myUnits, unitOneMoves, unitTwoMoves);
+            List<Position> unsafePositions = friendlyMechPositions(gameState, initUnitOne, initUnitTwo, priority, myUnits, unitOneMoves, unitTwoMoves);
             rowOne = 11 - unsafePositions.get(0).y;
             columnOne = unsafePositions.get(0).x;
             rowTwo = 11 - unsafePositions.get(1).y;
             columnTwo = unsafePositions.get(1).x;
         }
+
+        int padding = 0;
+        int turns = gameState.getTurnsTaken();
+        if(turns >= 10) {
+            padding = 1;
+        }
+        if(turns >= 15) {
+            padding = 2;
+        }
+        if(turns >= 20) {
+            padding = 3;
+        }
+        if(turns >= 24) {
+            padding = 4;
+        }
+        if(turns >= 27) {
+            padding = 5;
+        }
+        if(turns >= 28) {
+            padding = 6;
+        }
+
         System.out.println("Mech number " + (priority - 1));
         System.out.println("Current row " + row);
         System.out.println("Current column " + column);
         System.out.println("Friendly mech: " + rowOne + " " + columnOne);
         System.out.println("Friendly mech: " + rowTwo + " " + columnTwo);
+        int myTeamNum = 1;
+        if(myUnits.get(0).getId() == 4 || myUnits.get(0).getId() == 5 || myUnits.get(0).getId() == 6) {
+            myTeamNum = 2;
+        }
+
         //System.out.println("Checking terrain for UP: " + !isTerrainPresent(gameState, row, column + 1));
-        System.out.println("Checking 1st mech for RIGHT: " + (row != rowOne || column + 1 != columnOne));
-        System.out.println("Checking 2nd mech for RIGHT: " + (row != rowTwo || column + 1 != columnTwo));
-        if(row > 0 && !isTerrainPresent(gameState, row - 1, column) && (row - 1 != rowOne || column != columnOne) &&
-                (row - 1 != rowTwo || column != columnTwo)) {
+        //System.out.println("Checking 1st mech for RIGHT: " + (row != rowOne || column + 1 != columnOne));
+        //System.out.println("Checking 2nd mech for RIGHT: " + (row != rowTwo || column + 1 != columnTwo));
+        if (row > 0 && !isTerrainPresent(gameState, row - 1, column) &&
+                    (row - 1 != rowOne || column != columnOne) && (row - 1 != rowTwo || column != columnTwo) && row > padding) {
             result.add(Direction.UP);
         }
 
         if(row < 11 && !isTerrainPresent(gameState, row + 1, column) && (row + 1 != rowOne || column != columnOne) &&
-                (row + 1 != rowTwo || column != columnTwo)) {
+                    (row + 1 != rowTwo || column != columnTwo) && row < 11 - padding) {
             result.add(Direction.DOWN);
         }
 
-        if(column > 0 && !isTerrainPresent(gameState, row, column - 1) && (row != rowOne || column - 1 != columnOne) &&
-                (row != rowTwo || column - 1 != columnTwo)) {
+        if (column > 0 && !isTerrainPresent(gameState, row, column - 1) && (row != rowOne || column - 1 != columnOne) &&
+                    (row != rowTwo || column - 1 != columnTwo) && column > padding) {
             result.add(Direction.LEFT);
         }
 
-        if(column < 11 && !isTerrainPresent(gameState, row, column + 1) && (row != rowOne || column + 1 != columnOne) &&
-                (row != rowTwo || column + 1 != columnTwo)) {
+        if (column < 11 && !isTerrainPresent(gameState, row, column + 1) && (row != rowOne || column + 1 != columnOne) &&
+                    (row != rowTwo || column + 1 != columnTwo) && column < 11 - padding) {
             result.add(Direction.RIGHT);
         }
 
@@ -451,6 +498,105 @@ public class Strategy {
         }
 
         return result;
+    }
+
+
+    // Update the tiles with the values of the border
+    public static Tile[][] getTiles(GameState gameState) {
+        Tile[][] tiles = gameState.getTiles();
+        int turnsTaken = gameState.getTurnsTaken();
+        int padding = 0;
+
+        if(turnsTaken >= 15 - 1) {
+            updateTilesWithBorders(tiles, padding);
+        }
+        if(turnsTaken >= 20 - 1) {
+            padding = 1;
+            updateTilesWithBorders(tiles, padding);
+        }
+        if(turnsTaken >= 24 - 1) {
+            padding = 2;
+            updateTilesWithBorders(tiles, padding);
+        }
+        if(turnsTaken >= 27 - 1) {
+            padding = 2;
+            updateTilesWithBorders(tiles, padding);
+        }
+        if(turnsTaken >= 29 - 1) {
+            padding = 2;
+            updateTilesWithBorders(tiles, padding);
+        }
+        if(turnsTaken >= 30 - 1) {
+            padding = 3;
+            updateTilesWithBorders(tiles, padding);
+        }
+
+        return tiles;
+    }
+
+
+    // Fill rows and columns with DESTRUCTIBLE given some padding to represent the border
+    public static void updateTilesWithBorders(Tile[][] tiles, int padding) {
+        // Fill rows
+        for(int i = 0; i < 2; i++) {
+            for(int j = 0; j < 11; j++) {
+                tiles[(1 - i)*(padding) + (i) * (11 - padding)][j].setType(Tile.Type.DESTRUCTIBLE);
+            }
+        }
+
+        // Fill columns
+        for(int i = 0; i < 2; i++) {
+            for(int j = 0; j < 11; j++) {
+                tiles[j][(1 - i)*(padding) + (i) * (11 - padding)].setType(Tile.Type.DESTRUCTIBLE);
+            }
+        }
+    }
+
+    public static Direction checkAttackDirection(GameState gameState, List<Unit> enemyUnits, List<Unit> myUnits,
+                                                 Direction[] movementSteps, int u, Direction intendedDirection) {
+
+        // Attack if would damage walls or an enemy unit
+        int enemyTeamNum = 1;
+        if(enemyUnits.get(0).getId() == 4 || enemyUnits.get(0).getId() == 5 || enemyUnits.get(0).getId() == 6) {
+            enemyTeamNum = 2;
+        }
+        // Get positions of attack
+        Direction attackDirection = Direction.STAY;
+        List<Pair<Position, Integer>> posOfAttack =
+                gameState.getPositionsOfAttackPattern(
+                        gameState.getPositionAfterMovement(myUnits.get(u).getPos(), movementSteps),
+                        myUnits.get(u).getAttack(), intendedDirection);
+
+        for(Pair p : posOfAttack){
+            Position pos = (Position)p.getFirst();
+            try {
+                Tile t = gameState.getTiles()[pos.x][pos.y];
+                if(enemyTeamNum == 1) {
+                    if (t.getType() != Tile.Type.BLANK || (t.getUnit().getId() == 1 || t.getUnit().getId() == 2 ||
+                            t.getUnit().getId() == 3)) {
+                        attackDirection = intendedDirection;
+                    }
+                    if(t.getUnit().getId() == 4 || t.getUnit().getId() == 5 || t.getUnit().getId() == 6) {
+                        attackDirection = Direction.STAY;
+                        break;
+                    }
+                } else if(enemyTeamNum == 2) {
+                    if (t.getType() != Tile.Type.BLANK || (t.getUnit().getId() == 4 || t.getUnit().getId() == 5 ||
+                            t.getUnit().getId() == 6)) {
+                        attackDirection = intendedDirection;
+                    }
+                    if(t.getUnit().getId() == 1 || t.getUnit().getId() == 2 || t.getUnit().getId() == 3) {
+                        attackDirection = Direction.STAY;
+                        break;
+                    }
+                }
+            } catch(Exception e){
+                continue;
+            }
+        }
+
+        return attackDirection;
+
     }
 
 }
