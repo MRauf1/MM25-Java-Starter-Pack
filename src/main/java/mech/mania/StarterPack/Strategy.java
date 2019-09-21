@@ -81,6 +81,7 @@ public class Strategy {
     }
 /////////////////////////////////////////////////////////////////////////////////
 
+    // Attack stuff starts here
     /**
      * Returns a List of Direction arrays, one for each unit still alive, that contains
      * the optimal directions for attack; namely those without friendlies or out of bounds
