@@ -81,7 +81,13 @@ public class Strategy {
     }
 /////////////////////////////////////////////////////////////////////////////////
 
-
+    /**
+     * Returns a List of Direction arrays, one for each unit still alive, that contains
+     * the optimal directions for attack; namely those without friendlies or out of bounds
+     * chars
+     * @param gameState A game state variable
+     * @return A list of direction arrays
+     */
     public List<Direction[]> possibleAttacks(GameState gameState) {
 
         List<Direction[]> allAttacks = new ArrayList<Direction[]>(); // ret list
@@ -93,31 +99,33 @@ public class Strategy {
 
         int playerNum = gameState.getPlayerNum();
         List<Unit> myUnits = gameState.getPlayerUnits(playerNum);
+        List<Unit> enemyUnits = gameState.getPlayerUnits(playerNum == 1 ? 2 : 1);
 
         for(int u = 0; u < myUnits.size(); u++) {
             Position unitPos = myUnits.get(u).getPos();
             int x = unitPos.x;
             int y = unitPos.y;
 
+            // Checks corners, and then end points to possibly eliminate bad targets
+
             if(this.checkPosition(new Position(x+1, y+1), myUnits) == -1) {
                 dirs.remove(Direction.UP);
                 dirs.remove(Direction.LEFT);
             }
 
-            else if(this.checkPosition(new Position(x+1, y-1), myUnits) == -1) {
-                dirs.remove(Direction.UP);
-                dirs.remove(Direction.RIGHT);
-            }
+            else if(this.checkPosition(new Position(x, y+2), myUnits) == -1) { dirs.remove(Direction.UP); }
 
-            else if(this.checkPosition(new Position(x-1, y+1), myUnits) == -1) {
-                dirs.remove(Direction.DOWN);
-                dirs.remove(Direction.LEFT);
-            }
+            else if(this.checkPosition(new Position(x-2, y), myUnits) == -1) { dirs.remove(Direction.LEFT); }
 
-            else if(this.checkPosition(new Position(x-1, y-1), myUnits) == -1) {
+
+            if(this.checkPosition(new Position(x-1, y-1), myUnits) == -1) {
                 dirs.remove(Direction.RIGHT);
                 dirs.remove(Direction.DOWN);
             }
+
+            else if(this.checkPosition(new Position(x+2, y), myUnits) == -1) { dirs.remove(Direction.RIGHT); }
+
+            else if(this.checkPosition(new Position(x, y-2), myUnits) == -1) { dirs.remove(Direction.DOWN); }
 
             allAttacks.add(this.convertListArray(dirs)); // adds the filtered array of directions to the list
             dirs = this.fillDirList(dirs); // idk about that, should fill up the list again
@@ -142,7 +150,34 @@ public class Strategy {
             if(pos.x == u.getPos().x || pos.y == u.getPos().y) { return -1; }
         }
 
+
         return 0;
+    }
+
+    /**
+     * Prototype checkPosition method- returns value > 0 for enemy on tile
+     * @param pos Given Position object
+     * @param myUnits A list of friendly units
+     * @param enemyUnits A list of enemy units
+     * @return An integer describing the entity on the given position
+     */
+    public int checkPosition(Position pos, List<Unit> myUnits, List<Unit> enemyUnits) {
+        if(pos.x > 11 || pos.x < 0 || pos.y > 11 || pos.y < 0) { return -1; }
+
+        for(Unit u : myUnits) {
+            if(pos.x == u.getPos().x || pos.y == u.getPos().y) { return -1; }
+        }
+
+        int enemyCount = 0;
+        for(Unit e : enemyUnits) {
+            Position enemyPos = e.getPos();
+            int eX = enemyPos.x;
+            int eY = enemyPos.y;
+
+            if(eX == pos.x && eY == pos.y) { enemyCount++; }
+        }
+
+        return enemyCount;
     }
 
     /**
