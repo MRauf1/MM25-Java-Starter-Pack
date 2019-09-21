@@ -112,7 +112,7 @@ public class Strategy {
         }
 
         return allAttacks;
-        
+
     }
 
 
