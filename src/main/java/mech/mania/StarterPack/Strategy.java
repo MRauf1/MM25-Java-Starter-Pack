@@ -89,6 +89,12 @@ public class Strategy {
      * @see Decision
      */
     public Decision[] doTurn(GameState gameState){
+
+        // TODO:
+        // Function that returns the board with positions not to go to
+        // Code for randomized movement
+        // Function that decides the direction of the attack based on the map
+
         int playerNum = gameState.getPlayerNum();
         List<Unit> myUnits = gameState.getPlayerUnits(playerNum);
         List<Unit> enemyUnits = gameState.getPlayerUnits(playerNum == 1 ? 2 : 1);
