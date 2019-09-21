@@ -89,10 +89,7 @@ public class Strategy {
         // has every direction possible
         List<Direction> dirs = new ArrayList<Direction>();
 
-        dirs.add(Direction.UP);
-        dirs.add(Direction.DOWN);
-        dirs.add(Direction.RIGHT);
-        dirs.add(Direction.LEFT);
+        dirs = this.fillDirList(dirs);
 
         int playerNum = gameState.getPlayerNum();
         List<Unit> myUnits = gameState.getPlayerUnits(playerNum);
@@ -105,6 +102,21 @@ public class Strategy {
             if(this.checkPosition(new Position(x+1, y+1), myUnits) == -1) {
                 dirs.remove(Direction.UP);
                 dirs.remove(Direction.LEFT);
+            }
+
+            else if(this.checkPosition(new Position(x+1, y-1), myUnits) == -1) {
+                dirs.remove(Direction.UP);
+                dirs.remove(Direction.RIGHT);
+            }
+
+            else if(this.checkPosition(new Position(x-1, y+1), myUnits) == -1) {
+                dirs.remove(Direction.DOWN);
+                dirs.remove(Direction.LEFT);
+            }
+
+            else if(this.checkPosition(new Position(x-1, y-1), myUnits) == -1) {
+                dirs.remove(Direction.RIGHT);
+                dirs.remove(Direction.DOWN);
             }
 
             allAttacks.add(this.convertListArray(dirs)); // adds the filtered array of directions to the list
