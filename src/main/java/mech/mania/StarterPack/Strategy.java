@@ -361,6 +361,12 @@ public class Strategy {
                 unitTwoDirection = movementSteps;
             }
 
+            int randomFriendlyFireBuffer = (int) (Math.random() * 3) + 9;
+            if(gameState.getTurnsTaken() < randomFriendlyFireBuffer) {
+                turnResponse[u] = new Decision(priority, movementSteps, Direction.STAY, myUnits.get(u).getId());
+                continue;
+            }
+
             Direction attackDirection = Direction.STAY;
             // Skipping STAY direction
             for(int i = 0; i < Direction.values().length - 1; i++) {
@@ -402,12 +408,16 @@ public class Strategy {
         Unit unitTwoInitial = myUnits.get(1);
         Unit unitThreeInitial = myUnits.get(2);
         ArrayList<Position> result = new ArrayList<Position>();
+        Tile[][] tiles = gameState.getTiles();
         if(priority == 1) {
             result.add(unitTwoInitial.getPos());
             result.add(unitThreeInitial.getPos());
         } else if(priority == 2) {
             System.out.println("Unit 1 start: " + initUnitOne.x + " " + initUnitOne.y);
             Position unitOneFinal = gameState.getPositionAfterMovement(initUnitOne, unitOneMoves);
+
+            tiles[11 - unitOneFinal.y][unitOneFinal.x].setUnit(myUnits.get(0));
+
             result.add(unitOneFinal);
             result.add(unitThreeInitial.getPos());
             System.out.println("Mech 2's perspective. Mech 1 x: " + result.get(0).x);
@@ -415,6 +425,10 @@ public class Strategy {
         } else if(priority == 3) {
             Position unitOneFinal = gameState.getPositionAfterMovement(initUnitOne, unitOneMoves);
             Position unitTwoFinal = gameState.getPositionAfterMovement(initUnitTwo, unitTwoMoves);
+
+            tiles[11 - unitOneFinal.y][unitOneFinal.x].setUnit(myUnits.get(0));
+            tiles[11 - unitTwoFinal.y][unitTwoFinal.x].setUnit(myUnits.get(1));
+
             result.add(unitOneFinal);
             result.add(unitTwoFinal);
         }
@@ -567,27 +581,24 @@ public class Strategy {
                         gameState.getPositionAfterMovement(myUnits.get(u).getPos(), movementSteps),
                         myUnits.get(u).getAttack(), intendedDirection);
 
+
         for(Pair p : posOfAttack){
             Position pos = (Position)p.getFirst();
             try {
                 Tile t = gameState.getTiles()[pos.x][pos.y];
                 if(enemyTeamNum == 1) {
-                    if (t.getType() != Tile.Type.BLANK || (t.getUnit().getId() == 1 || t.getUnit().getId() == 2 ||
-                            t.getUnit().getId() == 3)) {
+                    if (t.getType() != Tile.Type.BLANK || (t.getUnit().getId() == 1 || t.getUnit().getId() == 2 || t.getUnit().getId() == 3)) {
                         attackDirection = intendedDirection;
                     }
                     if(t.getUnit().getId() == 4 || t.getUnit().getId() == 5 || t.getUnit().getId() == 6) {
-                        attackDirection = Direction.STAY;
-                        break;
+                        return Direction.STAY;
                     }
                 } else if(enemyTeamNum == 2) {
-                    if (t.getType() != Tile.Type.BLANK || (t.getUnit().getId() == 4 || t.getUnit().getId() == 5 ||
-                            t.getUnit().getId() == 6)) {
+                    if (t.getType() != Tile.Type.BLANK || (t.getUnit().getId() == 4 || t.getUnit().getId() == 5 || t.getUnit().getId() == 6)) {
                         attackDirection = intendedDirection;
                     }
                     if(t.getUnit().getId() == 1 || t.getUnit().getId() == 2 || t.getUnit().getId() == 3) {
-                        attackDirection = Direction.STAY;
-                        break;
+                        return Direction.STAY;
                     }
                 }
             } catch(Exception e){
