@@ -155,6 +155,8 @@ public class Strategy {
         return 0;
     }
 
+
+    // I just used this for the method below oof
     /**
      * Prototype checkPosition method- returns value > 0 for enemy on tile
      * @param pos Given Position object
