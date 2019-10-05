@@ -74,9 +74,9 @@ public class Strategy {
         int[][] attackPattern = {
                 {0, 0, 0, 0, 0, 0, 0},
                 {0, 0, 0, 0, 0, 0, 0},
-                {0, 0, 0, 0, 1, 1, 0},
-                {0, 0, 0, 0, 1, 1, 0},
-                {0, 0, 0, 0, 1, 1, 0},
+                {0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 1, 1, 1},
+                {0, 0, 0, 0, 0, 0, 0},
                 {0, 0, 0, 0, 0, 0, 0},
                 {0, 0, 0, 0, 0, 0, 0}
         };
@@ -90,7 +90,7 @@ public class Strategy {
                 {false, false, false, false, false, false, false}
         };
         int health = 8;
-        int speed = 3;
+        int speed = 4;
 
         UnitSetup unit1;
         UnitSetup unit2;
@@ -361,7 +361,7 @@ public class Strategy {
                 unitTwoDirection = movementSteps;
             }
 
-            int randomFriendlyFireBuffer = (int) (Math.random() * 3) + 9;
+            int randomFriendlyFireBuffer = (int) (Math.random() * 3) + 12;
             if(gameState.getTurnsTaken() < randomFriendlyFireBuffer) {
                 turnResponse[u] = new Decision(priority, movementSteps, Direction.STAY, myUnits.get(u).getId());
                 continue;
@@ -587,17 +587,23 @@ public class Strategy {
             try {
                 Tile t = gameState.getTiles()[pos.x][pos.y];
                 if(enemyTeamNum == 1) {
-                    if (t.getType() != Tile.Type.BLANK || (t.getUnit().getId() == 1 || t.getUnit().getId() == 2 || t.getUnit().getId() == 3)) {
-                        attackDirection = intendedDirection;
-                    }
-                    if(t.getUnit().getId() == 4 || t.getUnit().getId() == 5 || t.getUnit().getId() == 6) {
-                        return Direction.STAY;
-                    }
-                } else if(enemyTeamNum == 2) {
-                    if (t.getType() != Tile.Type.BLANK || (t.getUnit().getId() == 4 || t.getUnit().getId() == 5 || t.getUnit().getId() == 6)) {
+                    if (t.getType() != Tile.Type.BLANK) {
                         attackDirection = intendedDirection;
                     }
                     if(t.getUnit().getId() == 1 || t.getUnit().getId() == 2 || t.getUnit().getId() == 3) {
+                        return intendedDirection;
+                    }
+                    if(!(t.getUnit().getId() == 4 || t.getUnit().getId() == 5 || t.getUnit().getId() == 6)) {
+                        return Direction.STAY;
+                    }
+                } else if(enemyTeamNum == 2) {
+                    if (t.getType() != Tile.Type.BLANK) {
+                        attackDirection = intendedDirection;
+                    }
+                    if(t.getUnit().getId() == 4 || t.getUnit().getId() == 5 || t.getUnit().getId() == 6) {
+                        return intendedDirection;
+                    }
+                    if(!(t.getUnit().getId() == 1 || t.getUnit().getId() == 2 || t.getUnit().getId() == 3)) {
                         return Direction.STAY;
                     }
                 }
