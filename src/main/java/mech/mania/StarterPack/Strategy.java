@@ -113,6 +113,7 @@ public class Strategy {
     }
 /////////////////////////////////////////////////////////////////////////////////
 
+    // Attack stuff starts here
     /**
      * Returns a List of Direction arrays, one for each unit still alive, that contains
      * the optimal directions for attack; namely those without friendlies or out of bounds
@@ -159,7 +160,8 @@ public class Strategy {
 
             else if(this.checkPosition(new Position(x, y-2), myUnits) == -1) { dirs.remove(Direction.DOWN); }
 
-            allAttacks.add(this.convertListArray(dirs)); // adds the filtered array of directions to the list
+            Direction[] dirArray = this.convertListArray(dirs);
+            allAttacks.add(this.bestAttackDirections(dirArray, unitPos, myUnits, enemyUnits)); // adds the filtered array of directions to the list
             dirs = this.fillDirList(dirs); // idk about that, should fill up the list again
         }
 
@@ -186,6 +188,8 @@ public class Strategy {
         return 0;
     }
 
+
+    // I just used this for the method below oof
     /**
      * Prototype checkPosition method- returns value > 0 for enemy on tile
      * @param pos Given Position object
@@ -210,6 +214,61 @@ public class Strategy {
         }
 
         return enemyCount;
+    }
+
+
+    /**
+     * Takes in an array of Directions and assigns a score to each element (based upon enemies/out of bounds, etc.),
+     * returning an array of Directions with the highest scores.
+     * @param dirs An array of directions
+     * @param currentPosition A position object describing the position of the attacker
+     * @param myUnits A list of all allied units
+     * @param enemyUnits A list of all enemy units
+     * @return An array of the best directions to attack
+     */
+    public Direction[] bestAttackDirections(Direction[] dirs, Position currentPosition, List<Unit> myUnits, List<Unit> enemyUnits) {
+        int maxScore = 0;
+        int scoreDir = 0;
+
+        List<Direction> optimalAttacks = new ArrayList<Direction>();
+
+        int x = currentPosition.x;
+        int y = currentPosition.y;
+        for(Direction dir : dirs) {
+            switch(dir) {
+                case UP:
+                    scoreDir += this.checkPosition(new Position(x+1, y), myUnits, enemyUnits);
+                    scoreDir += this.checkPosition(new Position(x+2, y), myUnits, enemyUnits);
+                    scoreDir += this.checkPosition(new Position(x+1, y+1), myUnits, enemyUnits);
+                    scoreDir += this.checkPosition(new Position(x+1, y-1), myUnits, enemyUnits);
+
+                case RIGHT:
+                    scoreDir += this.checkPosition(new Position(x+1, y-1), myUnits, enemyUnits);
+                    scoreDir += this.checkPosition(new Position(x, y-1), myUnits, enemyUnits);
+                    scoreDir += this.checkPosition(new Position(x, y-2), myUnits, enemyUnits);
+                    scoreDir += this.checkPosition(new Position(x-1, y-1), myUnits, enemyUnits);
+
+                case DOWN:
+                    scoreDir += this.checkPosition(new Position(x-1, y), myUnits, enemyUnits);
+                    scoreDir += this.checkPosition(new Position(x-2, y), myUnits, enemyUnits);
+                    scoreDir += this.checkPosition(new Position(x-1, y+1), myUnits, enemyUnits);
+                    scoreDir += this.checkPosition(new Position(x-1, y-1), myUnits, enemyUnits);
+
+                case LEFT:
+                    scoreDir += this.checkPosition(new Position(x+1, y+1), myUnits, enemyUnits);
+                    scoreDir += this.checkPosition(new Position(x, y+1), myUnits, enemyUnits);
+                    scoreDir += this.checkPosition(new Position(x, y+2), myUnits, enemyUnits);
+                    scoreDir += this.checkPosition(new Position(x-1, y+1), myUnits, enemyUnits);
+            }
+
+            if(scoreDir >= maxScore) {
+                maxScore = scoreDir;
+                optimalAttacks.add(dir);
+            }
+        }
+
+        Direction[] optimalAttacksArr = this.convertListArray(optimalAttacks);
+        return optimalAttacksArr;
     }
 
     /**
